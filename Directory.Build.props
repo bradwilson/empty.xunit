@@ -1,0 +1,123 @@
+<Project>
+
+  <PropertyGroup>
+    <!-- Set this to 'true' or 'false' for full code analysis -->
+    <CodeAnalysisEnabled>false</CodeAnalysisEnabled>
+
+    <!-- Set this to 'v2' or 'v3' -->
+    <XunitVersion>v3</XunitVersion>
+
+    <!-- Set this to 'true' to include a reference to xunit.analyzers -->
+    <IncludeAnalyzers>true</IncludeAnalyzers>
+
+    <!-- Set this to 'true' to include the assertion library -->
+    <IncludeAssert>true</IncludeAssert>
+
+    <!-- Set this to 'true' or 'false' to add references to the runner utility packages instead of the core packages -->
+    <IncludeRunnerUtility>false</IncludeRunnerUtility>
+
+    <!-- Set this to 'true' or 'false' to add a reference to 'xunit.runner.visualstudio' -->
+    <IncludeRunnerVisualStudio>true</IncludeRunnerVisualStudio>
+
+    <!-- Set this to 'none', 'console', 'msbuild', or 'dotnet' to influence the runner type for the UnitTest target (run post-Build) -->
+    <PostBuildRunnerType>none</PostBuildRunnerType>
+
+    <!-- Set this to '', '.mtp-off', '.mtp-v1', or '.mtp-v2' -->
+    <XunitV3CoreVariant></XunitV3CoreVariant>
+
+    <!-- These are v3 specific enablement options -->
+    <UseMicrosoftTestingPlatformRunner>false</UseMicrosoftTestingPlatformRunner>
+    <TestingPlatformCaptureOutput>false</TestingPlatformCaptureOutput>
+
+    <!-- Set this to 'true' to disable MTP support in Visual Studio -->
+    <DisableTestingPlatformServerCapability>false</DisableTestingPlatformServerCapability>
+  </PropertyGroup>
+
+  <!-- Update these as new builds become available -->
+  <PropertyGroup>
+    <MicrosoftNETTestSdkVersion>18.0.1</MicrosoftNETTestSdkVersion>
+    <XunitVersionAnalyzers>1.27.0-pre.1</XunitVersionAnalyzers>
+    <XunitVersionV2>[2.9.4-pre.5, 2.99.0)</XunitVersionV2>
+    <XunitVersionV3>[3.2.2-pre.1, 3.99.0)</XunitVersionV3>
+    <XunitVersionVisualStudio>[3.1.6-pre.5, 3.99.0)</XunitVersionVisualStudio>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <Choose>
+    <When Condition=" '$(CodeAnalysisEnabled)' == 'true' ">
+      <PropertyGroup>
+        <AnalysisLevel>latest-All</AnalysisLevel>
+        <EnableNETAnalyzers>true</EnableNETAnalyzers>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+      </PropertyGroup>
+
+      <ItemGroup>
+        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.14.15" />
+      </ItemGroup>
+    </When>
+  </Choose>
+
+  <ItemGroup Condition=" '$(IncludeAnalyzers)' == 'true' ">
+    <PackageReference Include="xunit.analyzers" Version="$(XunitVersionAnalyzers)" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(IncludeRunnerVisualStudio)' == 'true' ">
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(MicrosoftNETTestSdkVersion)" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="$(XunitVersionVisualStudio)" />
+  </ItemGroup>
+
+  <Choose>
+    <When Condition=" '$(XunitVersion)' == 'v2' ">
+      <ItemGroup Condition=" '$(IncludeRunnerUtility)' != 'true' ">
+        <PackageReference Include="xunit.core" Version="$(XunitVersionV2)" />
+      </ItemGroup>
+
+      <ItemGroup Condition=" '$(IncludeRunnerUtility)' == 'true' ">
+        <PackageReference Include="xunit.runner.reporters" Version="$(XunitVersionV2)" />
+      </ItemGroup>
+
+      <ItemGroup Condition=" '$(IncludeAssert)' == 'true' ">
+        <PackageReference Include="xunit.assert" Version="$(XunitVersionV2)" />
+      </ItemGroup>
+
+      <ItemGroup Condition=" '$(PostBuildRunnerType)' == 'console' AND '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
+        <PackageReference Include="xunit.runner.console" Version="$(XunitVersionV2)" />
+      </ItemGroup>
+
+      <ItemGroup Condition=" '$(PostBuildRunnerType)' == 'msbuild' AND '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
+        <PackageReference Include="xunit.runner.msbuild" Version="$(XunitVersionV2)" />
+      </ItemGroup>
+    </When>
+
+    <When Condition=" '$(XunitVersion)' == 'v3' ">
+      <PropertyGroup>
+        <DefineConstants>XUNIT_V3</DefineConstants>
+        <OutputType>Exe</OutputType>
+      </PropertyGroup>
+
+      <ItemGroup Condition=" '$(IncludeRunnerUtility)' != 'true' ">
+        <PackageReference Include="xunit.v3.core$(XunitV3CoreVariant)" Version="$(XunitVersionV3)" />
+      </ItemGroup>
+
+      <ItemGroup Condition=" '$(IncludeRunnerUtility)' == 'true' ">
+        <PackageReference Include="xunit.v3.runner.utility" Version="$(XunitVersionV3)" />
+      </ItemGroup>
+
+      <ItemGroup Condition=" '$(IncludeAssert)' == 'true' ">
+        <PackageReference Include="xunit.v3.assert" Version="$(XunitVersionV3)" />
+      </ItemGroup>
+
+      <ItemGroup Condition=" '$(PostBuildRunnerType)' == 'console' ">
+        <PackageReference Include="xunit.v3.runner.console" Version="$(XunitVersionV3)" />
+      </ItemGroup>
+
+      <ItemGroup Condition=" '$(PostBuildRunnerType)' == 'msbuild' ">
+        <PackageReference Include="xunit.v3.runner.msbuild" Version="$(XunitVersionV3)" />
+      </ItemGroup>
+    </When>
+  </Choose>
+
+</Project>

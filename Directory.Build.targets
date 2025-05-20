@@ -1,0 +1,45 @@
+<Project>
+
+  <Target Name="UnitTest" AfterTargets="Build">
+
+    <!-- v2 Console, .NET Core -->
+    <Warning
+        Condition=" '$(XunitVersion)' == 'v2' AND '$(TargetFrameworkIdentifier)' == '.NETCoreApp' AND '$(PostBuildRunnerType)' == 'console' "
+        Text="Console is not supported for v2 .NET Core projects" />
+
+    <!-- v2 Console, .NET Framework -->
+    <Exec
+        Condition=" '$(XunitVersion)' == 'v2' AND '$(TargetFrameworkIdentifier)' == '.NETFramework' AND '$(PostBuildRunnerType)' == 'console' "
+        Command='"$(XunitConsole472Path)" "$(TargetPath)"'
+        IgnoreStandardErrorWarningFormat="true" />
+
+    <!-- v2 MSBuild, .NET Core -->
+    <Warning
+        Condition=" '$(XunitVersion)' == 'v2' AND '$(TargetFrameworkIdentifier)' == '.NETCoreApp' AND '$(PostBuildRunnerType)' == 'msbuild' "
+        Text="MSBuild is not supported for v2 .NET Core projects" />
+
+    <!-- v2 MSBuild, .NET Framework -->
+    <xunit
+        Condition=" '$(XunitVersion)' == 'v2' AND '$(TargetFrameworkIdentifier)' == '.NETFramework' AND '$(PostBuildRunnerType)' == 'msbuild' "
+        Assemblies="$(TargetPath)" />
+
+    <!-- v3 Console -->
+    <Exec
+        Condition=" '$(XunitVersion)' == 'v3' AND '$(PostBuildRunnerType)' == 'console' AND '$(TargetFramework)' != '' "
+        Command='"$(XunitConsole472Path)" "$(TargetPath)"'
+        IgnoreStandardErrorWarningFormat="true" />
+
+    <!-- v3 MSBuild -->
+    <xunit
+        Condition=" '$(XunitVersion)' == 'v3' AND '$(PostBuildRunnerType)' == 'msbuild' AND '$(TargetFramework)' != '' "
+        Assemblies="$(TargetPath)" />
+
+    <!-- v2/v3 dotnet test -->
+    <Exec
+        Condition=" '$(PostBuildRunnerType)' == 'dotnet' "
+        Command='dotnet test --no-build --no-restore "$(MSBuildProjectDirectory)"'
+        IgnoreStandardErrorWarningFormat="true" />
+
+  </Target>
+
+</Project>
